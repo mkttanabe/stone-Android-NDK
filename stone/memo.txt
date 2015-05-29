@@ -1,0 +1,80 @@
+
+use android-ndk-r10 or later.
+
+ https://developer.android.com/ndk/
+
+notes for PIE (Position-independent executable)
+- Android 5 or higher  -> only supports PIE
+- Android 4.1 - 4.4    -> supports both PIE and non-PIE
+- Android 4.0 or below -> only supports non-PIE. 
+                          PIE causes segfault!
+see details below:
+ http://stackoverflow.com/questions/24818902/running-a-native-library-on-android-l-error-only-position-independent-executab
+ https://code.google.com/p/android-developer-preview/issues/detail?id=888
+ http://stackoverflow.com/questions/8484814/is-pie-position-independent-executable-for-main-executables-supported-in-andro
+ https://www.duosecurity.com/blog/exploit-mitigations-in-android-jelly-bean-4-1
+
+------------------------------------
+ building binary for arm (non-PIE)
+------------------------------------
+ 1. copy "jni/lib/armebai/*.so"  to  "jni/lib/"
+
+ 2. enable following line in "jni/Application.mk"
+    APP_ABI := armeabi
+
+ 3. disable follwing lines in "jni/Android.mk"
+    #LOCAL_CFLAGS += -fPIE
+    #LOCAL_LDFLAGS += -fPIE -pie
+
+ 4. ndk-build -B NDK_LOG=1
+
+ 5. "libs/armeabi/stone" is the target
+
+------------------------------------
+  building binary for arm (PIE)
+------------------------------------
+ 1. copy "jni/lib/armebai/*.so"  to  "jni/lib/"
+
+ 2. enable following line in "jni/Application.mk"
+    APP_ABI := armeabi
+
+ 3. enable follwing lines in "jni/Android.mk"
+    LOCAL_CFLAGS += -fPIE
+    LOCAL_LDFLAGS += -fPIE -pie
+
+ 4. ndk-build -B NDK_LOG=1
+
+ 5. "libs/armeabi/stone" is the target
+
+------------------------------------
+ building binary for x86 (non-PIE)
+------------------------------------
+ 1. copy "jni/lib/x86/*.so"  to  "jni/lib/"
+
+ 2. enable following line in "jni/Application.mk"
+    APP_ABI := x86
+
+ 3. disable follwing lines in "jni/Android.mk"
+    #LOCAL_CFLAGS += -fPIE
+    #LOCAL_LDFLAGS += -fPIE -pie
+
+ 4. ndk-build -B NDK_LOG=1
+
+ 5. "libs/x86/stone" is the target
+
+------------------------------------
+ building binary for x86 (PIE)
+------------------------------------
+ 1. copy "jni/lib/x86/*.so"  to  "jni/lib/"
+
+ 2. enable following line in "jni/Application.mk"
+    APP_ABI := x86
+
+ 3. enable follwing lines in "jni/Android.mk"
+    LOCAL_CFLAGS += -fPIE
+    LOCAL_LDFLAGS += -fPIE -pie
+
+ 4. ndk-build -B NDK_LOG=1
+
+ 5. "libs/x86/stone" is the target
+
