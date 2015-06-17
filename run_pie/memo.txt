@@ -1,0 +1,48 @@
+
+use android-ndk-r10 or later.
+
+"run_pie" is a very useful tool developed by primiano@chromium.org.
+
+https://code.google.com/p/chromium/issues/detail?id=373219
+
+| Project Member     Reported by primi...@chromium.org,    May 14, 2014
+| 
+| Recent versions of Android require our native binaries 
+| (forwarder, md5sum, adb_reboot, purge_ashmem, memdump) to be PIE.
+| However, the same binaries must be also able to run on our bots 
+| running previous versions of Android all the way down to ICS.
+| Sadly, ICS doesn't seem to support PIE (see b/6587214 and crbug.com/147832).
+|                        :
+| 3) I managed to write a "run_pie" wrapper (cl coming soon) for supporting
+| PIE on ICS. The idea is to just wrap commands with run_pie /actual/binary args.
+| The (small) price to pay is two extra gyp flags (only for android tools exe
+| targets) to force the PIE executable to export "main", so the pie wrapper
+| can dlsym it (at least, as long as we'll support ICS).
+
+
+run_pie source:
+http://src.chromium.org/viewvc/chrome/trunk/src/tools/android/run_pie/?r1=270406&r2=270405&pathrev=270406
+
+--> place "run_pie.c" to jni/ directory.
+
+
+executables for testing:
+
+ - for_test/armeabi/stone_pie2
+ - for_test/armeabi/hello_pie2
+
+These executables were built with following options for "run_pie".
+
+LOCAL_CFLAGS +=-fvisibility=default -fPIE
+LOCAL_LDFLAGS += -rdynamic -pie
+
+
+Try under Android 4.0 (ICS) or older platform:
+
+# ./hello_pie2
+[1] + Stopped (signal)        ./hello_pie2
+[1]   Segmentation fault      ./hello_pie2
+
+# ./run_pie /data/local/tmp/hello_pie2
+hello!
+
